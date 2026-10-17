@@ -46,6 +46,9 @@ export function App() {
       setSessions(list)
       if (list.length > 0 && !currentSessionId) {
         setCurrentSessionId(list[0].sessionId)
+        if (list[0].modelSelection?.model) {
+          setCurrentModelId(list[0].modelSelection.model)
+        }
       } else if (list.length === 0) {
         const newId = await dsh.createSession()
         setCurrentSessionId(newId)
@@ -58,7 +61,7 @@ export function App() {
     try {
       const catalog = await dsh.getModelCatalog()
       setAvailableModels(catalog.models)
-      if (catalog.currentModel?.model) {
+      if (catalog.currentModel?.model && !currentModelId) {
         setCurrentModelId(catalog.currentModel.model)
       }
     } catch (err) {
@@ -241,11 +244,26 @@ export function App() {
     });
   };
 
+  // 切换会话时，自动同步该会话的模型选择
+  const handleSelectSession = (sessionId: string) => {
+    setCurrentSessionId(sessionId)
+    const target = sessions.find(s => s.sessionId === sessionId)
+    if (target?.modelSelection?.model) {
+      setCurrentModelId(target.modelSelection.model)
+    }
+  }
   // 5.5 切换模型
   const handleSelectModel = async (model: ModelItem) => {
     setCurrentModelId(model.id)
     if (currentSessionId) {
       await dsh.selectModel(currentSessionId, model.provider, model.id)
+      setSessions(prev =>
+        prev.map(s =>
+          s.sessionId === currentSessionId
+            ? { ...s, modelSelection: { provider: model.provider, model: model.id } }
+            : s
+        )
+      )
     }
   }
 
@@ -296,6 +314,7 @@ export function App() {
   )
 
   const activeSession = sessions.find(s => s.sessionId === currentSessionId)
+  const activeModelObj = availableModels.find(m => m.id === currentModelId) || availableModels[0]
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#FFF9FB] text-[#33202C]">
@@ -305,7 +324,7 @@ export function App() {
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         sessions={sessions}
         currentSessionId={currentSessionId}
-        onSelectSession={(id) => setCurrentSessionId(id)}
+        onSelectSession={handleSelectSession}
         onNewSession={handleNewSession}
         onRenameSession={handleRenameSession}
         onForkSession={handleForkSession}
@@ -331,9 +350,10 @@ export function App() {
           connectionStatus={connectionStatus}
           hasPreviewableCode={hasPreviewableCode}
           activeSessionTitle={activeSession?.title || '新灵感会话'}
+          activeModelName={activeModelObj?.name}
           sessions={sessions}
           currentSessionId={currentSessionId}
-          onSelectSession={(id) => setCurrentSessionId(id)}
+          onSelectSession={handleSelectSession}
           onNewSession={handleNewSession}
           onDeleteSession={handleDeleteSession}
           onRenameSession={handleRenameSession}

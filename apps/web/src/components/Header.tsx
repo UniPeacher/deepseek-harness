@@ -9,6 +9,7 @@ interface HeaderProps {
   connectionStatus: ConnectionStatus;
   hasPreviewableCode: boolean;
   activeSessionTitle: string;
+  activeModelName?: string;
   sessions: SessionItem[];
   currentSessionId: string;
   onSelectSession: (id: string) => void;
@@ -24,6 +25,7 @@ export const Header: React.FC<HeaderProps> = ({
   connectionStatus,
   hasPreviewableCode,
   activeSessionTitle,
+  activeModelName,
   sessions,
   currentSessionId,
   onSelectSession,
@@ -124,7 +126,9 @@ export const Header: React.FC<HeaderProps> = ({
 
             <div className="flex items-center gap-2 text-[10px] text-[#8C6D80] leading-none mt-0.5">
               {getStatusBadge()}
-              <span className="hidden sm:inline">DeepSeek 智能引擎</span>
+              <span className="font-medium text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded-md border border-rose-100/60 truncate max-w-[150px]">
+                {activeModelName || 'DeepSeek V4.1 Flash'}
+              </span>
             </div>
           </div>
         </div>

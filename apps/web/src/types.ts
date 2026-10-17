@@ -4,6 +4,11 @@ export interface SessionItem {
   updatedAt: number;
   messageCount?: number;
   isPinned?: boolean;
+  modelSelection?: {
+    provider: string;
+    model: string;
+    reasoningEffort?: string;
+  };
 }
 
 export interface ToolCallItem {

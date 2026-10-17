@@ -254,7 +254,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                 </span>
                 <div>
                   <div className="text-xs sm:text-sm font-bold text-[#33202C]">灵感控制中枢</div>
-                  <div className="text-[10px] text-rose-500 font-medium">Session & 模型沙盒</div>
+                  <div className="text-[10px] text-rose-500 font-medium">Session & 智能模型</div>
                 </div>
               </div>
 
@@ -268,44 +268,46 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
               </button>
             </div>
 
-            {/* 🔥 侧边栏首要位置：智能模型即时切换入口 (Model Selector) */}
-            <div className="relative px-3 pt-2.5 pb-1 border-b border-rose-100/40">
-              <div className="text-[10px] font-bold text-[#8C6D80] mb-1 flex items-center justify-between">
+            {/* 🔥 侧边栏核心：智能模型即时切换卡片 */}
+            <div className="relative px-3 pt-2.5 pb-2 border-b border-rose-100/60 bg-gradient-to-b from-rose-50/30 to-transparent">
+              <div className="text-[10px] font-bold text-[#8C6D80] mb-1.5 flex items-center justify-between">
                 <span className="flex items-center gap-1">
-                  <Cpu size={11} className="text-rose-500" />
-                  <span>AI 智能导师模型</span>
+                  <Cpu size={12} className="text-rose-500" />
+                  <span>当前会话推理模型</span>
                 </span>
-                <span className="text-[9px] text-rose-400 font-normal">点击即时切换</span>
+                <span className="text-[9px] text-rose-500 font-semibold bg-rose-100/60 px-1.5 py-0.2 rounded-full">
+                  已切换生效
+                </span>
               </div>
 
-              {/* 模型选择胶囊卡 */}
+              {/* 模型选择主卡片 */}
               <button
                 onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
-                className="flex w-full items-center justify-between rounded-xl border border-rose-200 bg-white px-2.5 py-1.5 text-left shadow-2xs hover:border-rose-300 transition-all active:scale-[0.99]"
+                className="flex w-full items-center justify-between rounded-2xl border border-rose-200/90 bg-white p-2.5 text-left shadow-2xs hover:border-rose-300 hover:shadow-xs transition-all active:scale-[0.99]"
               >
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-lg bg-rose-50 text-[10px]">
-                    ✨
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-rose-100 to-pink-100 text-rose-600 text-xs font-bold shadow-2xs">
+                    {activeModelObj?.id.includes('pro') ? '⚡' : '🚀'}
                   </span>
                   <div className="min-w-0">
                     <div className="truncate text-xs font-bold text-[#33202C]">
                       {activeModelObj?.name || 'DeepSeek V4.1 Flash'}
                     </div>
-                    <div className="truncate text-[9px] text-stone-400">
-                      {activeModelObj?.providerName || '官方云端引擎'}
+                    <div className="truncate text-[10px] text-stone-400">
+                      {activeModelObj?.description || '极速智能响应，适合日常教学设计与快速问答'}
                     </div>
                   </div>
                 </div>
-                <ChevronDown size={14} className={`text-stone-400 transition-transform ${modelDropdownOpen ? 'rotate-180 text-rose-500' : ''}`} />
+                <ChevronDown size={14} className={`text-stone-400 shrink-0 transition-transform duration-200 ${modelDropdownOpen ? 'rotate-180 text-rose-500' : ''}`} />
               </button>
 
               {/* 模型切换下拉浮层 */}
               {modelDropdownOpen && (
-                <div className="absolute top-full left-3 right-3 z-30 mt-1 rounded-2xl border border-rose-100 bg-white p-1.5 shadow-xl animate-in fade-in zoom-in-95 duration-150">
-                  <div className="text-[10px] font-medium text-stone-400 px-2 py-1">
-                    可选推理模型 ({availableModels.length})
+                <div className="absolute top-full left-3 right-3 z-40 mt-1 rounded-2xl border border-rose-200/80 bg-white/95 p-1.5 shadow-xl backdrop-blur-md animate-in fade-in zoom-in-95 duration-150">
+                  <div className="text-[10px] font-semibold text-stone-400 px-2 py-1">
+                    选择适用的智能引擎：
                   </div>
-                  <div className="max-h-48 overflow-y-auto space-y-1">
+                  <div className="space-y-1">
                     {availableModels.map((m) => {
                       const isSelected = m.id === currentModelId;
                       return (
@@ -315,17 +317,24 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                             onSelectModel(m);
                             setModelDropdownOpen(false);
                           }}
-                          className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left transition-all ${
+                          className={`flex w-full items-center justify-between rounded-xl p-2 text-left transition-all ${
                             isSelected
-                              ? 'bg-rose-50 font-bold text-rose-600'
-                              : 'text-stone-600 hover:bg-stone-50'
+                              ? 'bg-rose-50/90 font-bold text-rose-600 border border-rose-200/80'
+                              : 'text-stone-700 hover:bg-stone-50 border border-transparent'
                           }`}
                         >
-                          <div className="min-w-0">
-                            <div className="truncate text-xs">{m.name}</div>
-                            <div className="truncate text-[9px] text-stone-400">{m.providerName}</div>
+                          <div className="flex items-center gap-2 min-w-0">
+                            <span className="text-sm shrink-0">
+                              {m.id.includes('pro') ? '⚡' : '🚀'}
+                            </span>
+                            <div className="min-w-0">
+                              <div className="truncate text-xs">{m.name}</div>
+                              <div className="truncate text-[9px] text-stone-400 font-normal">
+                                {m.description || (m.id.includes('pro') ? '深度复杂推理' : '极速日常响应')}
+                              </div>
+                            </div>
                           </div>
-                          {isSelected && <Check size={14} className="text-rose-500 shrink-0" />}
+                          {isSelected && <Check size={14} className="text-rose-500 shrink-0 ml-1" />}
                         </button>
                       );
                     })}

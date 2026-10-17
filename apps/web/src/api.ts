@@ -182,6 +182,7 @@ class DshClient {
           title: it.projections?.values?.title || it.title || '新灵感会话',
           updatedAt: it.updatedAt || Date.now(),
           isPinned: pinned.has(it.sessionId),
+          modelSelection: it.projections?.values?.modelSelection?.next || it.projections?.values?.modelSelection?.lastUsed,
         }));
 
       // 置顶会话排在前面，其余按最近更新时间降序排
