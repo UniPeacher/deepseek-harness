@@ -7,6 +7,7 @@ import { InputBar } from './components/InputBar.tsx'
 import { LivePreviewDrawer } from './components/LivePreviewDrawer.tsx'
 import { SettingsModal } from './components/SettingsModal.tsx'
 import { PromptBuilderModal } from './components/PromptBuilderModal.tsx'
+import { CustomModelModal } from './components/CustomModelModal.tsx'
 import { dsh } from './api.ts'
 import type { MessageItem, SessionItem, ConnectionStatus, ModelItem } from './types.ts'
 
@@ -28,6 +29,7 @@ export function App() {
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [promptBuilderOpen, setPromptBuilderOpen] = useState(false)
+  const [modelManagerOpen, setModelManagerOpen] = useState(false)
 
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const config = dsh.getConfig()
@@ -333,6 +335,7 @@ export function App() {
         availableModels={availableModels}
         currentModelId={currentModelId}
         onSelectModel={handleSelectModel}
+        onOpenModelManager={() => setModelManagerOpen(true)}
         onOpenPromptBuilder={() => setPromptBuilderOpen(true)}
         onQuickPrompt={(text) => handleSend(text)}
         onOpenSettings={() => setSettingsOpen(true)}
@@ -347,6 +350,7 @@ export function App() {
           onOpenSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenPreview={() => setPreviewOpen(true)}
+          onOpenModelManager={() => setModelManagerOpen(true)}
           connectionStatus={connectionStatus}
           hasPreviewableCode={hasPreviewableCode}
           activeSessionTitle={activeSession?.title || '新灵感会话'}
@@ -408,6 +412,16 @@ export function App() {
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}
         messages={messages}
+      />
+
+      {/* 自定义模型管理弹窗 */}
+      <CustomModelModal
+        isOpen={modelManagerOpen}
+        onClose={() => setModelManagerOpen(false)}
+        availableModels={availableModels}
+        onRefreshModels={refreshSessions}
+        onSelectModel={handleSelectModel}
+        currentModelId={currentModelId}
       />
 
       {/* 设置与套壳 APK 配置弹窗 */}

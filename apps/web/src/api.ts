@@ -76,6 +76,74 @@ class DshClient {
     return this.currentStatus
   }
 
+  // 5. 模型配置管理 (支持用户自定义 API BaseURL, Key, 协议与模型)
+  public async addCustomProvider(params: {
+    route: string;
+    displayName: string;
+    baseURL: string;
+    apiKey?: string;
+    protocol?: 'openai-completions' | 'anthropic-messages';
+    models: Array<{ id: string; name: string; description?: string }>;
+  }): Promise<{ ok: boolean; error?: string }> {
+    try {
+      const keyRef = `PROVIDER_KEY_${params.route.toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
+      const hasKey = !!params.apiKey?.trim();
+
+      const profile: any = {
+        displayName: params.displayName || params.route,
+        api: params.protocol || 'openai-completions',
+        baseURL: params.baseURL.trim().replace(/\/+$/, ''),
+        models: params.models.map(m => ({
+          id: m.id,
+          name: m.name || m.id,
+          description: m.description || '',
+          contextWindow: 131072,
+        })),
+      };
+
+      if (hasKey) {
+        profile.apiKeyEnv = keyRef;
+      }
+
+      // 1. 写入 llm-pi-ai 设置
+      await this.rpc('settings/mutate', {
+        ns: 'llm-pi-ai',
+        ops: [{ op: 'set', path: ['providers', params.route], value: profile }],
+      });
+
+      // 2. 如果提供了 Key，写入安全凭据库
+      if (hasKey) {
+        await this.rpc('credentials/set', {
+          ref: keyRef,
+          value: params.apiKey!.trim(),
+        });
+      }
+
+      return { ok: true };
+    } catch (err: any) {
+      console.error('Failed to add custom provider:', err);
+      return { ok: false, error: err.message || '配置保存失败' };
+    }
+  }
+
+  // 删除自定义提供商
+  public async deleteCustomProvider(route: string): Promise<boolean> {
+    try {
+      const keyRef = `PROVIDER_KEY_${route.toUpperCase().replace(/[^A-Z0-9]/g, '_')}`;
+      await this.rpc('settings/mutate', {
+        ns: 'llm-pi-ai',
+        ops: [{ op: 'unset', path: ['providers', route] }],
+      });
+      try {
+        await this.rpc('credentials/unset', { ref: keyRef });
+      } catch {}
+      return true;
+    } catch (err) {
+      console.error('Failed to delete provider:', err);
+      return false;
+    }
+  }
+
   // 构建 API URL
   private getApiBase(): string {
     const config = this.getConfig()

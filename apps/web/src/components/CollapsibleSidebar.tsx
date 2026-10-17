@@ -40,6 +40,7 @@ interface CollapsibleSidebarProps {
   availableModels: ModelItem[];
   currentModelId: string;
   onSelectModel: (model: ModelItem) => void;
+  onOpenModelManager?: () => void;
   // 附加功能
   onOpenPromptBuilder: () => void;
   onQuickPrompt: (text: string) => void;
@@ -62,6 +63,7 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
   availableModels,
   currentModelId,
   onSelectModel,
+  onOpenModelManager,
   onOpenPromptBuilder,
   onQuickPrompt,
   onOpenSettings,
@@ -339,6 +341,22 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
                       );
                     })}
                   </div>
+
+                  {/* ⚙️ 接入与管理自定义模型按钮 */}
+                  {onOpenModelManager && (
+                    <div className="mt-2 pt-1.5 border-t border-rose-100/70">
+                      <button
+                        onClick={() => {
+                          setModelDropdownOpen(false);
+                          onOpenModelManager();
+                        }}
+                        className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-rose-50 py-1.5 text-[11px] font-bold text-rose-600 hover:bg-rose-100 active:scale-95 transition-all"
+                      >
+                        <Plus size={13} />
+                        <span>接入/配置更多自定义模型 (URL & Key)</span>
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

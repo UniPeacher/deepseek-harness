@@ -6,6 +6,7 @@ interface HeaderProps {
   onOpenSidebar: () => void;
   onOpenSettings: () => void;
   onOpenPreview: () => void;
+  onOpenModelManager?: () => void;
   connectionStatus: ConnectionStatus;
   hasPreviewableCode: boolean;
   activeSessionTitle: string;
@@ -22,6 +23,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenSidebar,
   onOpenSettings,
   onOpenPreview,
+  onOpenModelManager,
   connectionStatus,
   hasPreviewableCode,
   activeSessionTitle,
@@ -126,9 +128,14 @@ export const Header: React.FC<HeaderProps> = ({
 
             <div className="flex items-center gap-2 text-[10px] text-[#8C6D80] leading-none mt-0.5">
               {getStatusBadge()}
-              <span className="font-medium text-rose-500 bg-rose-50 px-1.5 py-0.5 rounded-md border border-rose-100/60 truncate max-w-[150px]">
-                {activeModelName || 'DeepSeek V4.1 Flash'}
-              </span>
+              <button
+                type="button"
+                onClick={onOpenModelManager}
+                className="font-medium text-rose-500 bg-rose-50 hover:bg-rose-100/80 px-1.5 py-0.5 rounded-md border border-rose-100/60 truncate max-w-[150px] cursor-pointer transition-colors"
+                title="点击配置/切换自定义模型与渠道"
+              >
+                ⚙️ {activeModelName || 'DeepSeek V4.1 Flash'}
+              </button>
             </div>
           </div>
         </div>
