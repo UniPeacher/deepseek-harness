@@ -9,6 +9,18 @@
     <meta name="theme-color" content="#FFF5F8" />
     <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
     <title>🌸 Vibe Muse · 萌系编程助理</title>
+    <script>
+      if (!Promise.withResolvers) {
+        Promise.withResolvers = function () {
+          var resolve, reject;
+          var promise = new Promise(function (res, rej) {
+            resolve = res;
+            reject = rej;
+          });
+          return { promise: promise, resolve: resolve, reject: reject };
+        };
+      }
+    </script>
     <style>
       /* Safe area inset variables and base touch behavior */
       :root {
