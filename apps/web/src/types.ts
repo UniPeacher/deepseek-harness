@@ -30,7 +30,7 @@ export interface MessageItem {
 
 export interface InspirationPrompt {
   id: string
-  category: 'starter' | 'vibe' | 'fix' | 'deploy'
+  category: 'geo' | 'lesson' | 'starter' | 'vibe' | 'fix'
   emoji: string
   title: string
   description: string

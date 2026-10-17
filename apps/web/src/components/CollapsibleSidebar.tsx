@@ -117,11 +117,12 @@ export const CollapsibleSidebar: React.FC<CollapsibleSidebarProps> = ({
 
   const activeModelObj = availableModels.find((m) => m.id === currentModelId) || availableModels[0];
 
+  // 快捷造物灵感预设
   const quickIdeas = [
-    { title: '💖 恋爱纪念日倒数卡', prompt: '帮我设计一个高级温柔的恋爱纪念日倒数卡网页，带有粒子光效和天数计算！' },
-    { title: '☕ 探店小红书拍立得', prompt: '制作一个复古咖啡探店拍立得画廊，点击照片可以翻转查看我的手账评价！' },
-    { title: '🧸 今日心情盲盒抽卡', prompt: '制作一个治愈系今日心情盲盒翻牌器，3D翻牌效果，点击揭晓暖心金句！' },
-    { title: '💅 美甲与穿搭色卡生成', prompt: '设计一个马卡龙低饱和度色卡搭配生成器，点击可以一键复制色号！' },
+    { title: '🌀 热力环流与海陆风动态模拟', prompt: '帮我设计一个高级温柔的中学地理【热力环流与海陆风交互演示课件】网页，带白天黑夜切换、动态粒子流动与等压面弯曲！' },
+    { title: '🏔️ 等高线与地形剖面切片仪', prompt: '制作一个直观易懂的【等高线地形图切片模拟器】，可拖动海拔高度查看闭合曲线生成与部位判读口诀！' },
+    { title: '🌧️ 冷暖锋面过境天气演变', prompt: '制作一个【冷锋与暖锋过境交互微课】，可动态对比冷暖气团移动抬升、降水区域与城市天气仪表跳变！' },
+    { title: '📋 新课标河流地貌教学设计', prompt: '请按照新课标四大核心素养，为我生成一份【人教版高中地理河流地貌】标准教学设计教案与板书设计！' },
   ];
 
   return (

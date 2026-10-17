@@ -1,7 +1,119 @@
 import React, { useState } from 'react';
-import { Sparkles, Palette, Wrench, Wand2, ArrowRight } from 'lucide-react';
-import type { InspirationPrompt } from '../types.ts'
+import { Sparkles, Compass, BookOpen, Wand2, ArrowRight } from 'lucide-react';
+import type { InspirationPrompt } from '../types.ts';
 
+// 🌍 1. 地理微课交互课件（专为地理师范生打造）
+const GEO_PROMPTS: InspirationPrompt[] = [
+  {
+    id: 'geo-1',
+    category: 'geo',
+    emoji: '🌀',
+    title: '热力环流与海陆风动态模拟器',
+    description: '可拖拽调节陆地与海洋冷热，动态演示等压面弯曲与气流闭合环流',
+    prompt: `你是一位中学地理教学课件专家。请为我编写一个单文件【热力环流与海陆风交互演示课件】（HTML/CSS/JS 全集成）：
+1. 核心交互：包含“白天（陆热海冷）/ 夜晚（陆冷海热）”切换按钮，或冷热温度滑动条；
+2. 动态视觉：用柔和优美的粒子/箭头流线动态展现空气垂直上升下沉与水平流动（冷下沉高压、热上升低压）；
+3. 知识图解：可切换显示“等压面弯曲形态（高凸低凹）”以及对应的近地面风向（海风/陆风）；
+4. 教学配套：卡片下方带考点记忆口诀（如“热升冷沉、高高低低”）；
+5. 适配手机全屏与触屏操作，粉白清爽现代手账画风，适合在试讲或微课比赛中直接全屏演示。`,
+    tags: ['高中必修一', '动态流线', '等压面', '试讲教具'],
+  },
+  {
+    id: 'geo-2',
+    category: 'geo',
+    emoji: '🏔️',
+    title: '等高线地形图 3D 切片与剖面仪',
+    description: '山顶、山脊、山谷、鞍部、陡崖的可视化切片与实时地形剖面线',
+    prompt: `请为我设计并编写一个【等高线与地形剖面图交互教学课件】（单文件 HTML/CSS/JS）：
+1. 界面绘制一个经典山地地形（包含山顶、山脊、山谷、鞍部、陡崖）；
+2. 交互功能：拖动“海拔切片高度”滑块，动态展示水平切面与闭合等高线的生成过程；
+3. 部位判读：点击任意部位（如山脊、山谷），高亮显示并弹出判读口诀（“凸低为脊，凸高为谷”）；
+4. 地形剖面线：支持沿 AB 虚线生成实时的垂直剖面变化折线；
+5. 采用温暖清新、富有师范教育美感的手账 UI，能直接在手机浏览器中全屏触控演示。`,
+    tags: ['初高中衔接', '等高线判读', '剖面图', '空间建构'],
+  },
+  {
+    id: 'geo-3',
+    category: 'geo',
+    emoji: '🌧️',
+    title: '冷锋与暖锋过境天气演变模拟',
+    description: '冷暖气团移动对抗、锋面倾斜、降水区位置及过境前后气温气压仪表',
+    prompt: `请为我编写一个中学地理【锋面系统与天气动态交互微课】（单文件 HTML/CSS/JS）：
+1. 支持一键切换“冷锋”与“暖锋”两种模式；
+2. 动态动画：冷暖气团的主动移动与被迫抬升，清晰标出锋面倾斜方向与降水区（冷锋雨后/暖锋雨前）；
+3. 城市天气站仪表盘：点击“推进时间（过境前 → 过境时 → 过境后）”，城市仪表盘的气温、气压、阴晴降水指标随之联动跳变；
+4. 试讲提问卡：右侧折叠一个小卡片，列出课堂启发性提问清单；
+5. 全面屏适配，交互顺畅丝滑，画风温柔柔和。`,
+    tags: ['锋面天气', '过境前后对比', '动态降水', '微课神器'],
+  },
+  {
+    id: 'geo-4',
+    category: 'geo',
+    emoji: '☀️',
+    title: '太阳直射点与气压带风带季节移动',
+    description: '拖动季节滑块（二分二至），气压带风带随太阳直射点纬度南北移动',
+    prompt: `请为我制作一个【太阳直射点移动与三圈环流季节位移】教学演示单页（单文件 HTML/CSS/JS）：
+1. 拖动时间滑块（春分 → 夏至 → 秋分 → 冬至），左侧地球仪的太阳直射纬线动态上下滑动；
+2. 右侧全球气压带风带（赤道低压带、副热带高压带、信风带、西风带）随直射点同步发生 5°~10° 的南北季节移动；
+3. 地中海气候成因联动：点击“地中海地区”，直观显示夏受副高控制干燥少雨、冬受西风控制温和湿润的切换；
+4. 界面温润雅致，排版清晰，专为中学地理课堂交互演示设计。`,
+    tags: ['气压带风带', '气候成因', '季节移动', '核心素养'],
+  },
+];
+
+// 📝 2. 地理教学设计与说课试讲工作台
+const LESSON_PROMPTS: InspirationPrompt[] = [
+  {
+    id: 'lesson-1',
+    category: 'lesson',
+    emoji: '📋',
+    title: '新课标地理教学设计（教案）生成',
+    description: '一键生成紧扣新课标四大核心素养的标准教学设计，含情境与活动设计',
+    prompt: `你是一位特级地理教师兼师范生教学导师。请针对高中地理【人教版必修一：常见地貌类型（河流地貌）】为我撰写一份完整的【新课标地理教学设计】：
+包含：
+一、 课题与课标要求
+二、 核心素养目标（人地协调观、综合思维、区域认知、地理实践力的具体可衡量表述）
+三、 教学重难点与突破策略
+四、 教学过程（1. 真实生活情境导入；2. 探究任务一：溯源侵蚀与V型谷；3. 探究任务二：侧蚀曲流与牛轭湖；4. 探究任务三：堆积地貌与冲积扇、三角洲）
+五、 板书设计草图（结构化思维导图排版）
+六、 课堂巩固检测与课后实践任务单。
+格式要极其规范专业，可直接作为教学技能大赛或试讲评比的标准教案！`,
+    tags: ['新课标教案', '四大素养', '板书设计', '比赛标准'],
+  },
+  {
+    id: 'lesson-2',
+    category: 'lesson',
+    emoji: '🎤',
+    title: '10~15 分钟无生试讲逐字台词稿',
+    description: '包含互动停顿、启发提问、板书时机和学生回答预设的标准试讲台词',
+    prompt: `请为我编写一份 10~15 分钟【无生试讲逐字台词脚本】。
+课题：【高中地理必修一：大气的受热过程（太阳暖大地、大地暖大气、大气还大地）】。
+要求：
+1. 语言亲切生动、抑扬顿挫，符合优秀师范生教态；
+2. 详细标注【动作/眼神/板书时机/停顿点】（如：【转身板书】、【微笑环视、稍作停顿】）；
+3. 包含生活化情境导入（如：为什么山顶比山脚冷？为什么月球昼夜温差几百摄氏度而地球很宜居？）；
+4. 包含 3 次精彩的生生/师生互动问答预设及教师启发性点评；
+5. 最后 1 分钟精炼总结与升华（温室效应与低碳人地协调观）。`,
+    tags: ['教资面试', '试讲逐字稿', '课堂互动', '高分台风'],
+  },
+  {
+    id: 'lesson-3',
+    category: 'lesson',
+    emoji: '🧭',
+    title: '中学地理研学旅行方案策划',
+    description: '设计基于真实地域的研学旅行手册、考察路线与探究实践任务单',
+    prompt: `请帮我策划一份中学地理【研学旅行活动方案与学生探究手册】。
+地点：以【喀斯特地貌与地质考察（如贵州织金洞或桂林阳朔）】为主题。
+内容包括：
+1. 研学目标与学科素养关联（突出地理实践力）；
+2. 3 天实地考察路线规划与安全预案；
+3. 沿途学生探究任务单（溶洞钟乳石测量、地下暗河观察、峰林峰丛对比记录表）；
+4. 研学成果展示方式（手账汇报、微视频、考察报告评价量规）。`,
+    tags: ['地理实践力', '研学手册', '野外考察', '探究任务'],
+  },
+];
+
+// ✨ 3. 经典萌系小工具起手式
 const STARTER_PROMPTS: InspirationPrompt[] = [
   {
     id: 'starter-1',
@@ -11,15 +123,6 @@ const STARTER_PROMPTS: InspirationPrompt[] = [
     description: '粉白奶油风倒数日单页，支持自定义天数与浪漫星光动效',
     prompt: '我想做一个超好看的粉白奶油风恋爱/纪念日倒数日小单页。请直接为我编写单文件 HTML/CSS/JS 代码，包含：1. 倒数天数大数字显示；2. 背景有浪漫柔和的星光微粒呼吸动效；3. 可以让我修改纪念日名字；4. 适配手机竖屏浏览。',
     tags: ['奶油粉白', '浪漫动效', '极易上手'],
-  },
-  {
-    id: 'starter-2',
-    category: 'starter',
-    emoji: '☕',
-    title: '复古咖啡馆探店打卡',
-    description: '小红书拍立得画廊风格，可记录每次咖啡探店心得与评星',
-    prompt: '帮我设计并编写一个复古咖啡馆探店打卡小单页。视觉风格采用法式复古与温暖奶咖色，包含小红书风格的拍立得照片卡片、星级评分、探店标签和推荐手冲清单，请用单文件 HTML/CSS/JS 交付，能直接在手机浏览器或APK全屏查看。',
-    tags: ['法式复古', '小红书风', '探店日记'],
   },
   {
     id: 'starter-3',
@@ -34,202 +137,142 @@ const STARTER_PROMPTS: InspirationPrompt[] = [
     id: 'starter-4',
     category: 'starter',
     emoji: '💅',
-    title: '美甲与穿搭色卡生成器',
+    title: '马卡龙穿搭与配色生成器',
     description: '点击一键随机生成一组马卡龙少女系配色方案并支持复制色号',
     prompt: '帮我做一个马卡龙色系的美甲与日常穿搭色卡生成器。每点一次按钮，随机生成 5 个互相搭配的温柔少女系色块，显示 HEX 颜色值并支持一键复制到剪贴板，界面要非常软萌可爱，像甜品店菜单一样精致！',
     tags: ['马卡龙配色', '色卡工具', '一键复制'],
   },
-]
-
-const VIBE_PROMPTS: InspirationPrompt[] = [
-  {
-    id: 'vibe-1',
-    category: 'vibe',
-    emoji: '🍰',
-    title: '注入马卡龙与奶油质感',
-    description: '把当前页面的配色换成草莓牛奶、香草奶油与柔和圆角阴影',
-    prompt: '请帮我把当前正在做的小工具视觉风格全面升级：采用温柔的草莓牛奶粉（#FF7597）、香草奶油底色（#FFF9FB）和薰衣草柔紫，将所有按钮和卡片换成 24px 大圆角与柔和漫反射阴影，让整个界面充满精致少女感。',
-    tags: ['草莓牛奶', '奶油微质感', '大圆角'],
-  },
-  {
-    id: 'vibe-2',
-    category: 'vibe',
-    emoji: '✨',
-    title: '添加软萌 Q 弹点击动效',
-    description: '给按钮、卡片添加轻盈的弹性动画与按下缩放微反馈',
-    prompt: '帮我给当前项目里的所有交互元素（按钮、开关、卡片）加上软萌 Q 弹的 CSS 点击动画！按下去时有微小的弹性下沉（scale 0.95），悬停时有轻微上浮呼吸动效，让操作起来像捏猫爪肉垫一样有手感。',
-    tags: ['Q弹动效', '微交互', '触控反馈'],
-  },
-  {
-    id: 'vibe-3',
-    category: 'vibe',
-    emoji: '🩰',
-    title: '升级高级极简法式排版',
-    description: '调整字体字偶间距、留白呼吸感，告别拥挤死板的程序员风',
-    prompt: '现在的页面排版稍微有些拥挤。请帮我用现代法式极简审美重新梳理布局：增大区域间的留白（padding/margin），选用优雅圆润的无衬线字体层级，并把重要信息做成呼吸感十足的半透明毛玻璃卡片（backdrop-blur）。',
-    tags: ['法式留白', '毛玻璃', '优雅排版'],
-  },
-]
-
-const FIX_PROMPTS: InspirationPrompt[] = [
-  {
-    id: 'fix-1',
-    category: 'fix',
-    emoji: '❓',
-    title: '页面白屏排错（温柔版）',
-    description: '打开什么都没显示？让导师说人话帮你一步步排查并修复',
-    prompt: '导师救命！我刚改完代码之后页面打开变成一片空白了，请帮我分析控制台可能报错的原因，用完全不用技术黑话的简单中文告诉我发生了什么，并直接帮我把修正好的完整代码发给我～',
-    tags: ['小白急救', '不用黑话', '一键修复'],
-  },
-  {
-    id: 'fix-2',
-    category: 'fix',
-    emoji: '📱',
-    title: '手机竖屏自适应优化',
-    description: '适配全面屏手机与套壳 APK，解决边缘遮挡与输入框弹窗变形',
-    prompt: '这个页面在手机竖屏或者套壳 APK 里面打开时，底部的文字和按钮容易被手机小黑条或者全面屏刘海遮住。请帮我加上标准移动端 viewport 和安全区适配（safe-area-inset），让在任何手机上全屏运行都非常完美！',
-    tags: ['全面屏适配', '安全区', '手机优化'],
-  },
-  {
-    id: 'fix-3',
-    category: 'fix',
-    emoji: '🖱️',
-    title: '按钮点击没反应检查',
-    description: '检查 JavaScript 监听事件与函数绑定，快速恢复点击效果',
-    prompt: '我点击界面上的按钮之后没有任何反应，不知道是事件没绑上还是 JS 逻辑有误。请帮我检查代码里的交互逻辑，把失效的点击事件修复，并顺便加上一个可爱的点击提示反馈 Toast。',
-    tags: ['交互修复', 'Toast反馈', '事件监听'],
-  },
-]
+];
 
 interface InspirationDeckProps {
-  onSelectPrompt: (promptText: string) => void
-  onOpenPromptBuilder: () => void
+  onSelectPrompt: (promptText: string) => void;
+  onOpenPromptBuilder: () => void;
 }
 
 export const InspirationDeck: React.FC<InspirationDeckProps> = ({
   onSelectPrompt,
   onOpenPromptBuilder,
 }) => {
-  const [activeTab, setActiveTab] = useState<'starter' | 'vibe' | 'fix'>('starter')
+  const [activeTab, setActiveTab] = useState<'geo' | 'lesson' | 'starter'>('geo');
 
   const getList = () => {
     switch (activeTab) {
+      case 'geo':
+        return GEO_PROMPTS;
+      case 'lesson':
+        return LESSON_PROMPTS;
       case 'starter':
-        return STARTER_PROMPTS
-      case 'vibe':
-        return VIBE_PROMPTS
-      case 'fix':
-        return FIX_PROMPTS
+      default:
+        return STARTER_PROMPTS;
     }
-  }
+  };
 
   return (
-    <div className="mx-auto w-full max-w-xl px-2 py-4">
-      {/* 头部欢迎问候 */}
-      <div className="mb-6 text-center animate-spring-pop">
-        <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-tr from-pink-200 via-rose-200 to-pink-300 text-3xl shadow-md shadow-pink-200/50 animate-float">
-          🌸
-        </div>
-        <h1 className="text-xl font-bold tracking-tight text-[#33202C]">
-          你好呀，我是你的 Vibe Coding 导师
-        </h1>
-        <p className="mt-1.5 text-xs text-[#7A5C6F] leading-relaxed max-w-sm mx-auto">
-          不用背代码，把你的奇思妙想告诉我，我手把手带你在手机上造出专属于你的梦幻小工具 ✨
-        </p>
+    <div className="flex flex-col space-y-4 py-2">
+      {/* 头部专属欢迎卡片 */}
+      <div className="relative overflow-hidden rounded-3xl border border-rose-200/80 bg-gradient-to-br from-[#FFF5F8] via-white to-pink-50/70 p-4.5 sm:p-5 shadow-xs">
+        <div className="flex items-start justify-between gap-3">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-rose-100/80 px-2.5 py-0.5 text-[11px] font-semibold text-rose-600">
+              <span>🌸</span>
+              <span>地理师范专属 · 灵感造物工坊</span>
+            </div>
+            <h2 className="text-base sm:text-lg font-bold text-[#33202C] tracking-wide">
+              今天想为地理课堂点亮什么新灵感？
+            </h2>
+            <p className="text-xs text-[#6B5061] leading-relaxed max-w-md">
+              一键生成能用手指交互的动态地理微课件，或秒出紧扣四大核心素养的标准试讲台本与教案。
+            </p>
+          </div>
 
-        {/* 灵感提词器入口卡片 */}
-        <div className="mt-4 px-2">
           <button
             onClick={onOpenPromptBuilder}
-            className="flex w-full items-center justify-between rounded-2xl border border-rose-200/80 bg-gradient-to-r from-rose-100/60 via-pink-50/70 to-rose-100/60 p-3.5 text-left shadow-xs transition-all hover:border-rose-300 hover:shadow-sm active:scale-[0.98]"
+            className="hidden sm:flex shrink-0 items-center gap-1.5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:brightness-105 active:scale-95 transition-all"
           >
-            <div className="flex items-center gap-2.5">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-rose-500 text-white shadow-xs">
-                <Wand2 size={18} />
-              </span>
-              <div>
-                <div className="text-xs font-bold text-[#33202C]">灵感魔杖 · 提词公式生成器</div>
-                <div className="text-[10px] text-[#8A667C]">选择风格+功能+受众，一秒拼出完美需求</div>
-              </div>
-            </div>
-            <ArrowRight size={16} className="text-rose-400 shrink-0" />
+            <Wand2 size={13} />
+            <span>智能提词魔杖</span>
           </button>
         </div>
       </div>
 
-      {/* 分类切换药丸 Tab */}
-      <div className="mb-3 flex items-center justify-center gap-1 rounded-2xl bg-rose-100/40 p-1">
+      {/* 分类药丸切换器 */}
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar p-0.5">
+        <button
+          onClick={() => setActiveTab('geo')}
+          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all shrink-0 ${
+            activeTab === 'geo'
+              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-xs'
+              : 'bg-white/80 text-[#6B5061] border border-rose-100 hover:bg-white'
+          }`}
+        >
+          <Compass size={13} />
+          <span>🌍 交互课件模拟器 ({GEO_PROMPTS.length})</span>
+        </button>
+
+        <button
+          onClick={() => setActiveTab('lesson')}
+          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all shrink-0 ${
+            activeTab === 'lesson'
+              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-xs'
+              : 'bg-white/80 text-[#6B5061] border border-rose-100 hover:bg-white'
+          }`}
+        >
+          <BookOpen size={13} />
+          <span>📝 试讲说课与教案 ({LESSON_PROMPTS.length})</span>
+        </button>
+
         <button
           onClick={() => setActiveTab('starter')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-medium transition-all ${
+          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all shrink-0 ${
             activeTab === 'starter'
-              ? 'bg-white text-rose-600 shadow-xs font-bold'
-              : 'text-[#6E5364] hover:text-rose-500'
+              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-xs'
+              : 'bg-white/80 text-[#6B5061] border border-rose-100 hover:bg-white'
           }`}
         >
           <Sparkles size={13} />
-          <span>初学者造物</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('vibe')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-medium transition-all ${
-            activeTab === 'vibe'
-              ? 'bg-white text-rose-600 shadow-xs font-bold'
-              : 'text-[#6E5364] hover:text-rose-500'
-          }`}
-        >
-          <Palette size={13} />
-          <span>审美调优</span>
-        </button>
-        <button
-          onClick={() => setActiveTab('fix')}
-          className={`flex flex-1 items-center justify-center gap-1.5 rounded-xl py-2 text-xs font-medium transition-all ${
-            activeTab === 'fix'
-              ? 'bg-white text-rose-600 shadow-xs font-bold'
-              : 'text-[#6E5364] hover:text-rose-500'
-          }`}
-        >
-          <Wrench size={13} />
-          <span>温柔排错</span>
+          <span>✨ 趣味手账小玩具 ({STARTER_PROMPTS.length})</span>
         </button>
       </div>
 
-      {/* 灵感卡片列表 */}
+      {/* 预设卡片列表 */}
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-        {getList().map(item => (
-          <button
+        {getList().map((item) => (
+          <div
             key={item.id}
             onClick={() => onSelectPrompt(item.prompt)}
-            className="group flex flex-col justify-between rounded-2xl border border-rose-100/90 bg-white/80 p-3.5 text-left transition-all hover:border-rose-300 hover:bg-white hover:shadow-md hover:shadow-rose-100/40 active:scale-[0.98]"
+            className="group relative flex flex-col justify-between rounded-2xl border border-rose-100/90 bg-white/90 p-3.5 shadow-2xs transition-all hover:border-rose-300 hover:shadow-xs active:scale-[0.99] cursor-pointer"
           >
             <div>
-              <div className="mb-1.5 flex items-center justify-between">
-                <span className="text-xl">{item.emoji}</span>
-                <span className="text-[10px] font-medium text-rose-400 opacity-80 group-hover:opacity-100">
-                  一键发送 ➔
+              <div className="flex items-center justify-between">
+                <span className="flex h-7 w-7 items-center justify-center rounded-xl bg-rose-50 text-base">
+                  {item.emoji}
+                </span>
+                <span className="opacity-0 group-hover:opacity-100 transition-opacity text-rose-500">
+                  <ArrowRight size={14} />
                 </span>
               </div>
-              <div className="text-xs font-bold text-[#33202C] group-hover:text-rose-600">
+
+              <h3 className="mt-2 text-xs sm:text-sm font-bold text-[#33202C] tracking-wide">
                 {item.title}
-              </div>
-              <p className="mt-1 text-[11px] text-[#785E6E] line-clamp-2 leading-relaxed">
+              </h3>
+              <p className="mt-1 text-[11px] text-[#8C6D80] leading-relaxed line-clamp-2">
                 {item.description}
               </p>
             </div>
 
-            <div className="mt-2.5 flex flex-wrap gap-1">
+            <div className="mt-3 flex flex-wrap gap-1">
               {item.tags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="rounded-md bg-rose-50 px-1.5 py-0.5 text-[9px] font-medium text-rose-500"
+                  className="rounded-full bg-rose-50/80 px-2 py-0.5 text-[10px] font-medium text-rose-600 border border-rose-100/60"
                 >
                   #{tag}
                 </span>
               ))}
             </div>
-          </button>
+          </div>
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
