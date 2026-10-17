@@ -8,7 +8,7 @@ import { LivePreviewDrawer } from './components/LivePreviewDrawer.tsx'
 import { SettingsModal } from './components/SettingsModal.tsx'
 import { PromptBuilderModal } from './components/PromptBuilderModal.tsx'
 import { dsh } from './api.ts'
-import type { MessageItem, SessionItem, ConnectionStatus } from './types.ts'
+import type { MessageItem, SessionItem, ConnectionStatus, ModelItem } from './types.ts'
 
 export function App() {
   const [sessions, setSessions] = useState<SessionItem[]>([])
@@ -17,6 +17,10 @@ export function App() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('disconnected')
+
+  // 模型状态
+  const [availableModels, setAvailableModels] = useState<ModelItem[]>([])
+  const [currentModelId, setCurrentModelId] = useState<string>('cn:deepseek-v4.1-flash')
 
   // 模态窗与抽屉状态
   const [sidebarOpen, setSidebarOpen] = useState(false)
@@ -35,7 +39,7 @@ export function App() {
     })
   }, [])
 
-  // 2. 初始化加载会话列表
+  // 2. 初始化加载会话列表与模型目录
   const refreshSessions = async () => {
     try {
       const list = await dsh.listSessions()
@@ -49,6 +53,16 @@ export function App() {
       }
     } catch (err) {
       console.error('Failed to list sessions:', err)
+    }
+
+    try {
+      const catalog = await dsh.getModelCatalog()
+      setAvailableModels(catalog.models)
+      if (catalog.currentModel?.model) {
+        setCurrentModelId(catalog.currentModel.model)
+      }
+    } catch (err) {
+      console.error('Failed to load model catalog:', err)
     }
   }
 
@@ -227,6 +241,14 @@ export function App() {
     });
   };
 
+  // 5.5 切换模型
+  const handleSelectModel = async (model: ModelItem) => {
+    setCurrentModelId(model.id)
+    if (currentSessionId) {
+      await dsh.selectModel(currentSessionId, model.provider, model.id)
+    }
+  }
+
   // 6. 发送消息
   const handleSend = async (customText?: string) => {
     const textToSend = (customText !== undefined ? customText : input).trim()
@@ -277,7 +299,7 @@ export function App() {
 
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#FFF9FB] text-[#33202C]">
-      {/* 1. 可收缩侧边栏 (管理 Session + 工作区沙盒 + 灵感库) */}
+      {/* 1. 可收缩侧边栏 (管理 Session + 切换模型 + 工作区沙盒 + 灵感库) */}
       <CollapsibleSidebar
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
@@ -289,6 +311,9 @@ export function App() {
         onForkSession={handleForkSession}
         onDeleteSession={handleDeleteSession}
         onTogglePinSession={handleTogglePinSession}
+        availableModels={availableModels}
+        currentModelId={currentModelId}
+        onSelectModel={handleSelectModel}
         onOpenPromptBuilder={() => setPromptBuilderOpen(true)}
         onQuickPrompt={(text) => handleSend(text)}
         onOpenSettings={() => setSettingsOpen(true)}

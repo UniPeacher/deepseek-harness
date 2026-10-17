@@ -44,4 +44,23 @@ export interface ConnectionConfig {
   workspaceDir: string
 }
 
-export type ConnectionStatus = 'connected' | 'connecting' | 'disconnected' | 'error'
+export type ConnectionStatus = 'connected' | 'connecting' | 'disconnected' | 'error';
+
+export interface ModelItem {
+  id: string;
+  name: string;
+  description?: string;
+  provider: string;
+  providerName: string;
+  reasoningEfforts?: string[];
+  defaultEffort?: string;
+}
+
+export interface ModelCatalogInfo {
+  currentModel?: {
+    provider: string;
+    model: string;
+    reasoningEffort?: string;
+  };
+  models: ModelItem[];
+}

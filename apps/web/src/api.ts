@@ -267,6 +267,53 @@ class DshClient {
     });
     return res.sessionId;
   }
+
+  // 7. 获取可用模型目录
+  public async getModelCatalog(): Promise<ModelCatalogInfo> {
+    try {
+      const res = await this.rpc('session/modelCatalog', {});
+      const list: ModelItem[] = [];
+      const groups = res.groups || [];
+      for (const g of groups) {
+        for (const m of g.models || []) {
+          list.push({
+            id: m.id,
+            name: m.name || m.id,
+            description: m.description,
+            provider: g.id,
+            providerName: g.name || g.id,
+            reasoningEfforts: m.reasoning?.efforts?.map((e: any) => e.id),
+            defaultEffort: m.reasoning?.defaultEffort,
+          });
+        }
+      }
+      return {
+        currentModel: res.default,
+        models: list,
+      };
+    } catch (err) {
+      console.error('Failed to get model catalog:', err);
+      return { models: [] };
+    }
+  }
+
+  // 8. 为指定会话切换模型
+  public async selectModel(
+    sessionId: string,
+    provider: string,
+    model: string,
+    reasoningEffort?: string
+  ): Promise<boolean> {
+    try {
+      const request: any = { sessionId, provider, model };
+      if (reasoningEffort) request.reasoningEffort = reasoningEffort;
+      await this.rpc('session/selectModel', { request });
+      return true;
+    } catch (err) {
+      console.error('Failed to select model:', err);
+      return false;
+    }
+  }
   public async sendPrompt(sessionId: string, text: string): Promise<boolean> {
     const requestId = `req-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     const res = await this.rpc('session/prompt', {
