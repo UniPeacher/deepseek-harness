@@ -281,8 +281,6 @@ export function App() {
       <CollapsibleSidebar
         isCollapsed={sidebarCollapsed}
         onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
-        isMobileOpen={sidebarOpen}
-        onCloseMobile={() => setSidebarOpen(false)}
         sessions={sessions}
         currentSessionId={currentSessionId}
         onSelectSession={(id) => setCurrentSessionId(id)}
@@ -302,7 +300,7 @@ export function App() {
       <div className="flex flex-1 flex-col overflow-hidden min-w-0">
         {/* 顶部导航 */}
         <Header
-          onOpenSidebar={() => setSidebarOpen(true)}
+          onOpenSidebar={() => setSidebarCollapsed(!sidebarCollapsed)}
           onOpenSettings={() => setSettingsOpen(true)}
           onOpenPreview={() => setPreviewOpen(true)}
           connectionStatus={connectionStatus}
