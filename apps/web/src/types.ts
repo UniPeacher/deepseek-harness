@@ -1,7 +1,8 @@
 export interface SessionItem {
-  sessionId: string
-  title: string
-  updatedAt: number
+  sessionId: string;
+  title: string;
+  updatedAt: number;
+  messageCount?: number;
 }
 
 export interface ToolCallItem {

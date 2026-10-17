@@ -154,18 +154,46 @@ export function App() {
   // 5. 新建会话
   const handleNewSession = async () => {
     try {
-      const newId = await dsh.createSession()
+      const newId = await dsh.createSession();
       const newSession: SessionItem = {
         sessionId: newId,
         title: '新灵感项目',
         updatedAt: Date.now(),
-      }
-      setSessions([newSession, ...sessions])
-      setCurrentSessionId(newId)
+      };
+      setSessions([newSession, ...sessions]);
+      setCurrentSessionId(newId);
     } catch (err) {
-      console.error('Create session error:', err)
+      console.error('Create session error:', err);
     }
-  }
+  };
+
+  // 5.1 重命名会话
+  const handleRenameSession = async (sessionId: string, newTitle: string) => {
+    setSessions((prev) =>
+      prev.map((s) => (s.sessionId === sessionId ? { ...s, title: newTitle } : s))
+    );
+    await dsh.renameSession(sessionId, newTitle);
+  };
+
+  // 5.2 分叉会话 (Fork)
+  const handleForkSession = async (sessionId: string) => {
+    try {
+      setLoading(true);
+      const newId = await dsh.forkSession(sessionId);
+      const source = sessions.find((s) => s.sessionId === sessionId);
+      const newSession: SessionItem = {
+        sessionId: newId,
+        title: source ? `${source.title} (副本)` : '分叉灵感项目',
+        updatedAt: Date.now(),
+      };
+      setSessions([newSession, ...sessions]);
+      setCurrentSessionId(newId);
+      setLoading(false);
+    } catch (err: any) {
+      console.error('Fork session error:', err);
+      setLoading(false);
+    }
+  };
 
   // 6. 发送消息
   const handleSend = async (customText?: string) => {
@@ -225,6 +253,10 @@ export function App() {
         connectionStatus={connectionStatus}
         hasPreviewableCode={hasPreviewableCode}
         activeSessionTitle={activeSession?.title || '新灵感会话'}
+        sessions={sessions}
+        currentSessionId={currentSessionId}
+        onSelectSession={(id) => setCurrentSessionId(id)}
+        onNewSession={handleNewSession}
       />
 
       {/* 侧滑会话手账抽屉 */}
@@ -233,8 +265,10 @@ export function App() {
         onClose={() => setSidebarOpen(false)}
         sessions={sessions}
         currentSessionId={currentSessionId}
-        onSelectSession={id => setCurrentSessionId(id)}
+        onSelectSession={(id) => setCurrentSessionId(id)}
         onNewSession={handleNewSession}
+        onRenameSession={handleRenameSession}
+        onForkSession={handleForkSession}
         serverUrl={config.serverUrl}
       />
 

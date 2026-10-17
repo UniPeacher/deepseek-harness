@@ -170,7 +170,26 @@ class DshClient {
     return res.sessionId
   }
 
-  // 3. 发送提示词 Prompt
+  // 5. 重命名会话
+  public async renameSession(sessionId: string, title: string): Promise<boolean> {
+    try {
+      await this.rpc('session/rename', {
+        request: { sessionId, title },
+      });
+      return true;
+    } catch (err) {
+      console.error('Rename session error:', err);
+      return false;
+    }
+  }
+
+  // 6. 分叉会话 (Fork)
+  public async forkSession(sessionId: string): Promise<string> {
+    const res = await this.rpc('session/fork', {
+      request: { sessionId },
+    });
+    return res.sessionId;
+  }
   public async sendPrompt(sessionId: string, text: string): Promise<boolean> {
     const requestId = `req-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`
     const res = await this.rpc('session/prompt', {
