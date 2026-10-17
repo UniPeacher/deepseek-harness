@@ -195,6 +195,37 @@ export function App() {
     }
   };
 
+  // 5.3 删除/归档会话
+  const handleDeleteSession = async (sessionId: string) => {
+    await dsh.deleteSession(sessionId);
+    const remaining = sessions.filter((s) => s.sessionId !== sessionId);
+    setSessions(remaining);
+
+    // 如果删除的是当前打开的会话，自动切换到下一个或新建
+    if (sessionId === currentSessionId) {
+      if (remaining.length > 0) {
+        setCurrentSessionId(remaining[0].sessionId);
+      } else {
+        await handleNewSession();
+      }
+    }
+  };
+
+  // 5.4 置顶/取消置顶会话
+  const handleTogglePinSession = async (sessionId: string) => {
+    await dsh.togglePinSession(sessionId);
+    setSessions((prev) => {
+      const updated = prev.map((s) =>
+        s.sessionId === sessionId ? { ...s, isPinned: !s.isPinned } : s
+      );
+      return updated.sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return b.updatedAt - a.updatedAt;
+      });
+    });
+  };
+
   // 6. 发送消息
   const handleSend = async (customText?: string) => {
     const textToSend = (customText !== undefined ? customText : input).trim()
@@ -257,6 +288,8 @@ export function App() {
         currentSessionId={currentSessionId}
         onSelectSession={(id) => setCurrentSessionId(id)}
         onNewSession={handleNewSession}
+        onDeleteSession={handleDeleteSession}
+        onRenameSession={handleRenameSession}
       />
 
       {/* 侧滑会话手账抽屉 */}
@@ -269,6 +302,8 @@ export function App() {
         onNewSession={handleNewSession}
         onRenameSession={handleRenameSession}
         onForkSession={handleForkSession}
+        onDeleteSession={handleDeleteSession}
+        onTogglePinSession={handleTogglePinSession}
         serverUrl={config.serverUrl}
       />
 

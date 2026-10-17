@@ -144,30 +144,107 @@ class DshClient {
     }
   }
 
-  // 1. 获取会话列表
+  private getLocalSet(key: string): Set<string> {
+    try {
+      const raw = localStorage.getItem(key);
+      return new Set(raw ? JSON.parse(raw) : []);
+    } catch {
+      return new Set();
+    }
+  }
+
+  private saveLocalSet(key: string, set: Set<string>): void {
+    try {
+      localStorage.setItem(key, JSON.stringify([...set]));
+    } catch {}
+  }
+
+  // 1. 获取会话列表 (支持过滤已删除/归档，置顶排序)
   public async listSessions(): Promise<SessionItem[]> {
     try {
-      const res = await this.rpc('session/list', { _request: {} })
-      this.setStatus('connected')
-      return (res.items || []).map((it: any) => ({
-        sessionId: it.sessionId,
-        title: it.projections?.values?.title || it.title || '新灵感会话',
-        updatedAt: it.updatedAt || Date.now(),
-      }))
+      const res = await this.rpc('session/list', { _request: {} });
+      this.setStatus('connected');
+      const archived = this.getLocalSet('vibe_archived_sessions');
+      const pinned = this.getLocalSet('vibe_pinned_sessions');
+
+      const items: SessionItem[] = (res.items || [])
+        .filter((it: any) => !archived.has(it.sessionId))
+        .map((it: any) => ({
+          sessionId: it.sessionId,
+          title: it.projections?.values?.title || it.title || '新灵感会话',
+          updatedAt: it.updatedAt || Date.now(),
+          isPinned: pinned.has(it.sessionId),
+        }));
+
+      // 置顶会话排在前面，其余按最近更新时间降序排
+      items.sort((a, b) => {
+        if (a.isPinned && !b.isPinned) return -1;
+        if (!a.isPinned && b.isPinned) return 1;
+        return b.updatedAt - a.updatedAt;
+      });
+
+      return items;
     } catch (err) {
-      this.setStatus('error')
-      throw err
+      this.setStatus('error');
+      throw err;
     }
+  }
+
+  // 获取已归档会话数量
+  public getArchivedCount(): number {
+    return this.getLocalSet('vibe_archived_sessions').size;
   }
 
   // 2. 创建新会话
   public async createSession(cwd?: string): Promise<string> {
-    const config = this.getConfig()
-    const targetCwd = cwd || config.workspaceDir || '/root/workspace'
+    const config = this.getConfig();
+    const targetCwd = cwd || config.workspaceDir || '/root/workspace';
     const res = await this.rpc('session/create', {
       request: { cwd: targetCwd },
-    })
-    return res.sessionId
+    });
+    return res.sessionId;
+  }
+
+  // 3. 删除/归档会话
+  public async deleteSession(sessionId: string): Promise<boolean> {
+    const archived = this.getLocalSet('vibe_archived_sessions');
+    archived.add(sessionId);
+    this.saveLocalSet('vibe_archived_sessions', archived);
+
+    const pinned = this.getLocalSet('vibe_pinned_sessions');
+    if (pinned.has(sessionId)) {
+      pinned.delete(sessionId);
+      this.saveLocalSet('vibe_pinned_sessions', pinned);
+    }
+
+    // 同时通知后端停止该 session 并归档
+    try {
+      await this.rpc('workspace/archiveSession', {
+        request: { sessionId, stopActivity: true },
+      });
+    } catch (err) {
+      console.warn('Backend archive error, local handled:', err);
+    }
+    return true;
+  }
+
+  // 4. 置顶/取消置顶会话
+  public async togglePinSession(sessionId: string): Promise<boolean> {
+    const pinned = this.getLocalSet('vibe_pinned_sessions');
+    const isNowPinned = !pinned.has(sessionId);
+    if (isNowPinned) {
+      pinned.add(sessionId);
+      try {
+        await this.rpc('workspace/pinSession', { request: { sessionId } });
+      } catch {}
+    } else {
+      pinned.delete(sessionId);
+      try {
+        await this.rpc('workspace/unpinSession', { request: { sessionId } });
+      } catch {}
+    }
+    this.saveLocalSet('vibe_pinned_sessions', pinned);
+    return isNowPinned;
   }
 
   // 5. 重命名会话

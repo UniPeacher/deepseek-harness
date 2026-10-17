@@ -3,6 +3,7 @@ export interface SessionItem {
   title: string;
   updatedAt: number;
   messageCount?: number;
+  isPinned?: boolean;
 }
 
 export interface ToolCallItem {
