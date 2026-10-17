@@ -126,15 +126,15 @@ export const Header: React.FC<HeaderProps> = ({
               )}
             </div>
 
-            <div className="flex items-center gap-2 text-[10px] text-[#8C6D80] leading-none mt-0.5">
+            <div className="flex items-center gap-1.5 text-[10px] text-[#8C6D80] leading-none mt-0.5">
               {getStatusBadge()}
               <button
                 type="button"
                 onClick={onOpenModelManager}
-                className="font-medium text-rose-500 bg-rose-50 hover:bg-rose-100/80 px-1.5 py-0.5 rounded-md border border-rose-100/60 truncate max-w-[150px] cursor-pointer transition-colors"
+                className="font-medium text-rose-500 bg-rose-50 hover:bg-rose-100/80 px-1.5 py-0.5 rounded-md border border-rose-100/60 truncate max-w-[110px] sm:max-w-[160px] cursor-pointer transition-colors"
                 title="点击配置/切换自定义模型与渠道"
               >
-                ⚙️ {activeModelName || 'DeepSeek V4.1 Flash'}
+                ⚙️ {activeModelName ? (activeModelName.length > 10 ? activeModelName.slice(0, 8) + '...' : activeModelName) : 'Flash'}
               </button>
             </div>
           </div>

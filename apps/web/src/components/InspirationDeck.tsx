@@ -168,26 +168,26 @@ export const InspirationDeck: React.FC<InspirationDeckProps> = ({
   };
 
   return (
-    <div className="flex flex-col space-y-4 py-2">
+    <div className="flex flex-col space-y-3 py-1">
       {/* 头部专属欢迎卡片 */}
-      <div className="relative overflow-hidden rounded-3xl border border-rose-200/80 bg-gradient-to-br from-[#FFF5F8] via-white to-pink-50/70 p-4.5 sm:p-5 shadow-xs">
-        <div className="flex items-start justify-between gap-3">
+      <div className="relative overflow-hidden rounded-2xl border border-rose-200/80 bg-gradient-to-br from-[#FFF5F8] via-white to-pink-50/70 p-3.5 sm:p-5 shadow-2xs">
+        <div className="flex items-start justify-between gap-2">
           <div className="space-y-1">
-            <div className="inline-flex items-center gap-1.5 rounded-full bg-rose-100/80 px-2.5 py-0.5 text-[11px] font-semibold text-rose-600">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-rose-100/80 px-2 py-0.5 text-[10px] sm:text-[11px] font-semibold text-rose-600">
               <span>🌸</span>
               <span>地理师范专属 · 灵感造物工坊</span>
             </div>
-            <h2 className="text-base sm:text-lg font-bold text-[#33202C] tracking-wide">
+            <h2 className="text-sm sm:text-base font-bold text-[#33202C] tracking-wide">
               今天想为地理课堂点亮什么新灵感？
             </h2>
-            <p className="text-xs text-[#6B5061] leading-relaxed max-w-md">
+            <p className="text-[11px] sm:text-xs text-[#6B5061] leading-relaxed max-w-md">
               一键生成能用手指交互的动态地理微课件，或秒出紧扣四大核心素养的标准试讲台本与教案。
             </p>
           </div>
 
           <button
             onClick={onOpenPromptBuilder}
-            className="hidden sm:flex shrink-0 items-center gap-1.5 rounded-2xl bg-gradient-to-r from-rose-500 to-pink-500 px-3.5 py-2 text-xs font-semibold text-white shadow-xs hover:brightness-105 active:scale-95 transition-all"
+            className="hidden sm:flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-rose-500 to-pink-500 px-3 py-1.5 text-xs font-semibold text-white shadow-2xs hover:brightness-105 active:scale-95 transition-all"
           >
             <Wand2 size={13} />
             <span>智能提词魔杖</span>
@@ -196,41 +196,41 @@ export const InspirationDeck: React.FC<InspirationDeckProps> = ({
       </div>
 
       {/* 分类药丸切换器 */}
-      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar p-0.5">
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5">
         <button
           onClick={() => setActiveTab('geo')}
-          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all shrink-0 ${
+          className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-all shrink-0 ${
             activeTab === 'geo'
-              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-xs'
+              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-2xs'
               : 'bg-white/80 text-[#6B5061] border border-rose-100 hover:bg-white'
           }`}
         >
-          <Compass size={13} />
-          <span>🌍 交互课件模拟器 ({GEO_PROMPTS.length})</span>
+          <Compass size={12} />
+          <span>🌍 交互课件 ({GEO_PROMPTS.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('lesson')}
-          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all shrink-0 ${
+          className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-all shrink-0 ${
             activeTab === 'lesson'
-              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-xs'
+              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-2xs'
               : 'bg-white/80 text-[#6B5061] border border-rose-100 hover:bg-white'
           }`}
         >
-          <BookOpen size={13} />
-          <span>📝 试讲说课与教案 ({LESSON_PROMPTS.length})</span>
+          <BookOpen size={12} />
+          <span>📝 试讲教案 ({LESSON_PROMPTS.length})</span>
         </button>
 
         <button
           onClick={() => setActiveTab('starter')}
-          className={`flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-medium transition-all shrink-0 ${
+          className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-medium transition-all shrink-0 ${
             activeTab === 'starter'
-              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-xs'
+              ? 'bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold shadow-2xs'
               : 'bg-white/80 text-[#6B5061] border border-rose-100 hover:bg-white'
           }`}
         >
-          <Sparkles size={13} />
-          <span>✨ 趣味手账小玩具 ({STARTER_PROMPTS.length})</span>
+          <Sparkles size={12} />
+          <span>✨ 趣味手账 ({STARTER_PROMPTS.length})</span>
         </button>
       </div>
 
