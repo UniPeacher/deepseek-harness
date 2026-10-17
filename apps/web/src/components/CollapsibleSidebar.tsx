@@ -19,6 +19,7 @@ import {
   Wand2,
   HardDrive,
   Copy,
+  ChevronDown,
 } from 'lucide-react';
 import type { SessionItem, ModelItem } from '../types.ts';
 

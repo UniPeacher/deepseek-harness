@@ -163,7 +163,7 @@ export function App() {
 
   // 4. 滚动到底部
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+    messagesEndRef.current?.scrollIntoView?.({ behavior: 'smooth' })
   }, [messages, loading])
 
   // 5. 新建会话

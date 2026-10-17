@@ -1,4 +1,12 @@
-import type { ConnectionConfig, ConnectionStatus, MessageItem, SessionItem, ToolCallItem } from './types.ts'
+import type {
+  ConnectionConfig,
+  ConnectionStatus,
+  MessageItem,
+  SessionItem,
+  ToolCallItem,
+  ModelItem,
+  ModelCatalogInfo,
+} from './types.ts'
 
 class DshClient {
   private rpcSeq = 0
