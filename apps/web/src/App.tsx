@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { Header } from './components/Header.tsx'
-import { Sidebar } from './components/Sidebar.tsx'
+import { CollapsibleSidebar } from './components/CollapsibleSidebar.tsx'
 import { InspirationDeck } from './components/InspirationDeck.tsx'
 import { MessageItemCard } from './components/MessageItemCard.tsx'
 import { InputBar } from './components/InputBar.tsx'
@@ -20,6 +20,7 @@ export function App() {
 
   // 模态窗与抽屉状态
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const [previewOpen, setPreviewOpen] = useState(false)
   const [promptBuilderOpen, setPromptBuilderOpen] = useState(false)
@@ -275,27 +276,13 @@ export function App() {
   const activeSession = sessions.find(s => s.sessionId === currentSessionId)
 
   return (
-    <div className="flex h-screen w-screen flex-col overflow-hidden bg-[#FFF9FB] text-[#33202C]">
-      {/* 顶部导航 */}
-      <Header
-        onOpenSidebar={() => setSidebarOpen(true)}
-        onOpenSettings={() => setSettingsOpen(true)}
-        onOpenPreview={() => setPreviewOpen(true)}
-        connectionStatus={connectionStatus}
-        hasPreviewableCode={hasPreviewableCode}
-        activeSessionTitle={activeSession?.title || '新灵感会话'}
-        sessions={sessions}
-        currentSessionId={currentSessionId}
-        onSelectSession={(id) => setCurrentSessionId(id)}
-        onNewSession={handleNewSession}
-        onDeleteSession={handleDeleteSession}
-        onRenameSession={handleRenameSession}
-      />
-
-      {/* 侧滑会话手账抽屉 */}
-      <Sidebar
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
+    <div className="flex h-screen w-screen overflow-hidden bg-[#FFF9FB] text-[#33202C]">
+      {/* 1. 可收缩侧边栏 (管理 Session + 工作区沙盒 + 灵感库) */}
+      <CollapsibleSidebar
+        isCollapsed={sidebarCollapsed}
+        onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
+        isMobileOpen={sidebarOpen}
+        onCloseMobile={() => setSidebarOpen(false)}
         sessions={sessions}
         currentSessionId={currentSessionId}
         onSelectSession={(id) => setCurrentSessionId(id)}
@@ -304,11 +291,33 @@ export function App() {
         onForkSession={handleForkSession}
         onDeleteSession={handleDeleteSession}
         onTogglePinSession={handleTogglePinSession}
+        onOpenPromptBuilder={() => setPromptBuilderOpen(true)}
+        onQuickPrompt={(text) => handleSend(text)}
+        onOpenSettings={() => setSettingsOpen(true)}
         serverUrl={config.serverUrl}
+        workspaceDir={config.workspaceDir}
       />
 
-      {/* 消息滚动流展示区 */}
-      <main className="flex-1 overflow-y-auto px-3 py-4 sm:px-6">
+      {/* 2. 右侧主体对话视口 */}
+      <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+        {/* 顶部导航 */}
+        <Header
+          onOpenSidebar={() => setSidebarOpen(true)}
+          onOpenSettings={() => setSettingsOpen(true)}
+          onOpenPreview={() => setPreviewOpen(true)}
+          connectionStatus={connectionStatus}
+          hasPreviewableCode={hasPreviewableCode}
+          activeSessionTitle={activeSession?.title || '新灵感会话'}
+          sessions={sessions}
+          currentSessionId={currentSessionId}
+          onSelectSession={(id) => setCurrentSessionId(id)}
+          onNewSession={handleNewSession}
+          onDeleteSession={handleDeleteSession}
+          onRenameSession={handleRenameSession}
+        />
+
+        {/* 消息滚动流展示区 */}
+        <main className="flex-1 overflow-y-auto px-3 py-4 sm:px-6">
         <div className="mx-auto max-w-2xl">
           {/* 无消息时展示新手灵感引导中枢 */}
           {messages.length === 0 ? (
@@ -371,6 +380,7 @@ export function App() {
         onClose={() => setPromptBuilderOpen(false)}
         onSubmit={prompt => handleSend(prompt)}
       />
+      </div>
     </div>
   )
 }
